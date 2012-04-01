@@ -162,15 +162,8 @@
 		 * @param int length Number of characters to highlight
 		 */
 		finder.highlight = function(query, startTag, endTag) {
-		//function highlightSearchTerms(searchText, treatAsPhrase, warnOnFailure, highlightStartTag, highlightEndTag)
-//{
-  // if the treatAsPhrase parameter is true, then we should search for 
-  // the entire phrase that was entered; otherwise, we will split the
-  // search string so that each word is searched for and highlighted
-  // individually
-  	var queryArray = [query];
-			window.console.log(queryArray);
-  /*
+		  	var queryArray = [query];
+ /*
   if (!document.body || typeof(document.body.innerHTML) == "undefined") {
     if (warnOnFailure) {
       alert("Sorry, for some reason the text of this page is unavailable. Searching will not work.");
@@ -178,15 +171,14 @@
     return false;
   }
   */
-  		var bodyText = $('#content')[0].innerHTML;
-
-  for (var i = 0; i < queryArray.length; i++) {
-    bodyText = doHighlight(bodyText, queryArray[i]);
-  }
+	  		var bodyText = $('#content')[0].innerHTML;
+	
+			for (var i = 0; i < queryArray.length; i++) {
+				bodyText = doHighlight(bodyText, queryArray[i]);
+			}
   
-  $('#content')[0].innerHTML = bodyText;
-  return true;
-  		
+			$('#content')[0].innerHTML = bodyText;
+			return true;
 		}
 
 /**
@@ -199,12 +191,11 @@
  * highlightStartTag or highlightEndTag parameters are omitted or
  * are empty strings then the default <font> tags will be used.
  */
-function doHighlight(bodyText, searchTerm, highlightStartTag, highlightEndTag) 
-{
+function doHighlight(bodyText, searchTerm, highlightStartTag, highlightEndTag) {
   // the highlightStartTag and highlightEndTag parameters are optional
-  if ((!highlightStartTag) || (!highlightEndTag)) {
-    highlightStartTag = "<font style='color:blue; background-color:yellow;'>";
-    highlightEndTag = "</font>";
+	if ((!highlightStartTag) || (!highlightEndTag)) {
+    highlightStartTag = '<span class="matches">';
+    highlightEndTag = '</span>';
   }
   
   // find all occurrences of the search term in the given text,
@@ -216,9 +207,10 @@ function doHighlight(bodyText, searchTerm, highlightStartTag, highlightEndTag)
   var i = -1;
   var lcSearchTerm = searchTerm.toLowerCase();
   var lcBodyText = bodyText.toLowerCase();
-    
+
+
   while (bodyText.length > 0) {
-    i = lcBodyText.indexOf(lcSearchTerm, i+1);
+  	i = lcBodyText.indexOf(lcSearchTerm, i+1);
     if (i < 0) {
       newText += bodyText;
       bodyText = "";
@@ -236,13 +228,14 @@ function doHighlight(bodyText, searchTerm, highlightStartTag, highlightEndTag)
     }
   }
   
+  
   return newText;
 }
 
 
 		
 		finder.clearHighlights = function() {
-			getContent().contents().find('.highlight').unwrap();
+			getContent()[0].innerHTML.find('.matches').unwrap();
 		};
 		
 		/**
@@ -286,6 +279,11 @@ function doHighlight(bodyText, searchTerm, highlightStartTag, highlightEndTag)
 						//finder.highlight(finder.findMatchPositions[finder.currentPosition], query.length);
 						//finder.highlight(3, 3);
 						finder.highlight(query);
+						
+						// enable first highlight
+						window.console.log($('.matches').get(0));
+						var first = $('.matches').get(finder.currentPosition);
+						$(first).addClass('enabled');
 					}
 				} else {
 					getSearchField().css('background-color', finder.colors.error);					

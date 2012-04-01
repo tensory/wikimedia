@@ -73,6 +73,12 @@ h3 {
 	padding-right: 10px;
 }
 
-span.highlight {
-	background-color: #DDD;
+span.matches {
+	background-color: none;
+	color: auto;
+}
+
+span.matches.enabled {
+	background-color: #FF0000;
+	color: blue;
 }
