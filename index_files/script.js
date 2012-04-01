@@ -15,6 +15,9 @@
 		
 		// Initialize Find on Page
 		Finder.init();
+		
+		// Initialize simple lightbox for images
+		Flatbox.init();
 	}); 
 	
 	/**
@@ -37,8 +40,6 @@
 		 * @param <object> element
 		 */
 		optimize.keepLinks = function(element) {
-			window.console.log(element);
-
 			$.each($(element).find('a'), function(index, e) {
 				var target = $(this).attr('href');
 				target = target.replace(/^(.+)#/, '#');
@@ -257,7 +258,7 @@
 				getPrevious().addClass('disabled');
 				getPrevious().removeAttr('href');
 			}
-		}
+		};
 
 		/**
 		 * init
@@ -343,4 +344,89 @@
 				
 		return finder;
 	})();
+	
+	/**
+	 * Flatbox
+	 * Simple lightbox for images. 
+	 */
+	 var Flatbox = (function() {
+	 	var flatbox = {};
+	 	
+	 	var getFlatBox = function() {
+	 		return $('#flatBox');
+	 	};
+	 	
+	 	var getFlatBoxImage = function() {
+	 		return $('#fbImg');
+	 	};
+	 	
+	 	var getFlatBoxCaption = function() {
+	 		return $('#fbCaption');
+	 	};
+	 	/**
+	 	 * Show the image and disable scrolling past it.
+	 	 * @param <object> image
+	 	 */
+	 	flatbox.show = function(image) {
+	 		// Disable moving
+/*
+	 		$(window).bind('touchmove', function(e) {
+	 			e.preventDefault();
+	 		});
+*/	 		
+	 		$('#flatBox').show();
+	 	};
+	 	
+	 	flatbox.clear = function() {
+	 	window.console.log('clearing');
+	 		$(window).unbind('touchmove');
+			$(window).bind('touchmove', function() {
+				return true;
+			});
+	 		
+	 		getFlatBox().hide();
+			getFlatBoxCaption().html('');	 		
+	 	};
+	 	
+	 	flatbox.remove = function() {
+	 		$('#flatBox').remove();
+	 	};
+	 	
+	 	flatbox.init = function() {
+	 		var html = '<div id="flatBox">' +
+	 			'<div id="fbScreen"></div>' +
+	 			'<div id="fbImg"></div>' +
+				'<div id="fbCaption"></div>' +
+	 			'</div>';
+	 		$('body').prepend($(html));
+	 		
+	 		$('#content img').click(function() {
+	 			// On click, deep clone the image copy to the viewer
+	 			var img = $(this).clone();
+	 			$(img).attr('id', 'fbCurrent');
+	 			$(img).css({
+	 			  'background-color' : '#FFFFFF',
+				  'margin' : '0 auto',
+				  'height' : '100%',
+				  'width' : ''
+				});
+		 			
+	 			getFlatBoxImage().html(img);
+				
+				// Place caption
+				var wrapper = $('<span id="fbCaptionWrap"></span>');
+				$(wrapper).text($(this).attr('title'));
+				getFlatBoxCaption().html(wrapper);
+	 			
+	 			flatbox.show($(this));
+	 		});
+	 		
+	 		// Hide on click
+	 		$('#fbImg, #fbCaption, #fbScreen').click(function(e) {
+	 			flatbox.clear();
+	 		})
+	 	};
+	 	
+	 	return flatbox;
+	 })();
 })(jQuery);
