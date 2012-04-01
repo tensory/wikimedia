@@ -6,33 +6,33 @@ body {
 #content {
 	margin: 22px;
 }
+@media only screen and (max-device-width: 800px) {
+	/* Text resets */
+	body {
+		font-size: 28px;
+	}
 
-/* Text resets */
-h1, h2, h3, h4, h5, h6 {
-	font-family: 'Crete Round', serif;
-	font-weight: normal;
-}
-
-body {
-	font-size: 28px;
-}
-
-h1 {
-	font-size: 40px;
-}
-
-h2 {
-	font-size: 36px;
-}
-
-h3 {
-	font-size: 32px;
+	h1, h2, h3, h4, h5, h6 {
+		font-family: 'Crete Round', serif;
+		font-weight: normal;
+	}
+	
+	h1 {
+		font-size: 40px;
+	}
+	
+	h2 {
+		font-size: 36px;
+	}
+	
+	h3 {
+		font-size: 32px;
+	}
 }
 
 /* Find On Page styles */
 .findtoggle {
 	display: none;
-	font-size: 24px;
 }
 
 .findtoggle a {
@@ -69,11 +69,11 @@ h3 {
 	float: left;
 	left: 0;
 	top: 14px;
-
 	font-size: 24px;
 	line-height: 24px;
 	height: 30px;
 	margin-right: 8px;
+	width: 200px;
 }
 
 #findOnPage button {
@@ -90,8 +90,24 @@ h3 {
 	margin: 0 5px 0 0;
 	font-family: 'Crete Round', serif;
 	font-weight: normal;
+	font-size: 28px;
 }
-
+/* Desktop styles for find command */
+@media only screen and (min-device-width: 1024px) {
+	#findOnPage label {
+		font-size: 20px;
+		top: 18px;
+		margin-right: 8px;
+	}
+	
+	#findOnPage input {
+		font-size: 14px;
+		line-height: 14px;
+		top: 19px;
+		height: 20px;
+		width: 200px;
+	}
+}
 span.matches {
 	background-color: none;
 	color: auto;
