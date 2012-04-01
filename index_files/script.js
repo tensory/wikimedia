@@ -11,7 +11,9 @@
 
 		// Set up resize handlers for orientationchange events
 		Optimize.bindOrientation();
+		Optimize.keepLinks($('#content ul'));
 		
+		// Initialize Find on Page
 		Finder.init();
 	}); 
 	
@@ -27,6 +29,21 @@
 			if ($(img).width() > $(window).width()) {
 				$(img).css('width', '100%');
 			}
+		};
+		
+		/**
+		 * keepLinks
+		 * Rewrite anchors to keep them within the domain
+		 * @param <object> element
+		 */
+		optimize.keepLinks = function(element) {
+			window.console.log(element);
+
+			$.each($(element).find('a'), function(index, e) {
+				var target = $(this).attr('href');
+				target = target.replace(/^(.+)#/, '#');
+				$(this).attr('href', target);
+			});
 		};
 	
 		/**

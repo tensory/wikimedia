@@ -60,6 +60,10 @@ h3 {
 	background: -moz-linear-gradient(top,  #EEE,  #BBB);
 }
 
+#findOnPage a {
+	border: none;
+}
+
 #findOnPage input {
 	position: relative;
 	float: left;
