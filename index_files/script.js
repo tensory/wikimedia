@@ -11,9 +11,6 @@
 		Optimize.bindOrientation();
 		
 		Finder.init();
-		
-		//temporary
-		$('#showToggle').click();
 	}); 
 	
 	/**
@@ -276,13 +273,10 @@
 			'<a class="icons delete" id="hideToggle"></a>' +
 			'<label for="searchText">Find</label>' + 
 			'<input type="text" id="searchText" name="searchText">' +
-			'<div id="findNav">' +
-				'<a href="#" class="icons prev disabled" id="findPrevious"></a>' +
-				'<a href="#" class="icons next" id="findNext"></a>' +
-			'</div>' +
-			/*
-			'<span id="clearsearch">clear</span><span id="findNext"><a href="">next</a></span></div></div>';
-			*/
+				'<div id="findNav">' +
+					'<a href="#" class="icons prev disabled" id="findPrevious"></a>' +
+					'<a href="#" class="icons next" id="findNext"></a>' +
+				'</div>' +
 			'</div>';
 			
 			
@@ -303,6 +297,9 @@
 			
 			$('#hideToggle').click(function(e) {
 				e.preventDefault();
+				// Destroy search information
+				finder.clearTags();
+				finder.searchBegan = false;
 				hide();
 			});
 			
@@ -320,9 +317,9 @@
 			});	
 			
 			// Assign different behavior to findNext depending on whether search has begun 
-			getNext().click(function(e) {
+			$('#findNext').delegate(this, 'click', function(e) {
 				e.preventDefault();
-				
+				window.console.log('clicked next');				
 				if (finder.searchBegan) {
 					finder.move('next');
 				} else {
@@ -335,11 +332,8 @@
 					if (query.length > 0) {
 						getSearchField().css('background-color', finder.colors.clear);
 	
-						finder.current = 0;					
-						finder.findMatchPositions(query, body, finder.current);
-	
-						// Highlight
-						if (finder.findMatchPositions.length > 0) {
+						finder.current = 0;
+						if (body.search(new RegExp(query)) !== -1) {
 							finder.highlightAll(query);
 							
 							// Enable first highlight
@@ -348,11 +342,10 @@
 							finder.searchBegan = true;
 						}
 					} else {
-						getSearchField().css('background-color', finder.colors.error);					
+						//getSearchField().css('background-color', finder.colors.error);					
 					}
 				}
 			});
-			
 		};
 				
 		return finder;

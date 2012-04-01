@@ -40,6 +40,7 @@ h3 {
 }
 
 #showToggle {
+	margin: 22px 22px 0;
 	display: block;
 }
 
@@ -52,14 +53,21 @@ h3 {
 	position: relative;
 	border-bottom: 1px #777;
 	height: 60px;
-	padding: 5px 20px;
+	padding: 0 20px;
+	margin: 0;
 	background: #DDDDDD;
 	background: -webkit-gradient(linear, left top, left bottom, from(#EEEEEE), to(#BBBBBB));
 	background: -moz-linear-gradient(top,  #EEE,  #BBB);
 }
 
 #findOnPage input {
+	position: relative;
+	float: left;
+	left: 0;
+	top: 14px;
+
 	font-size: 24px;
+	line-height: 24px;
 	height: 30px;
 	margin-right: 8px;
 }
@@ -70,12 +78,14 @@ h3 {
 }
 
 #findOnPage label {
+	position: relative;
+	float: left;
+	left: 0px;
+	top: 14px;
 	color: #777;
-	font-size: 24px;
-	line-height: 60px;
+	margin: 0 5px 0 0;
 	font-family: 'Crete Round', serif;
 	font-weight: normal;
-	padding-right: 10px;
 }
 
 span.matches {
