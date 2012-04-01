@@ -72,7 +72,14 @@
 			clear: '#FFFFFF'
 		};
 		
-		finder.currentPosition = 0;
+		finder.options = {
+			startTag: '<span class="matches">',
+			endTag: '</span>',
+			matchClass: 'matches',
+			onClass: 'enabled'
+		};
+		
+		finder.current = 0;
 		
 		// Private fns
 		var show = function() {
@@ -161,7 +168,7 @@
 		 * @param int position Location to highlight
 		 * @param int length Number of characters to highlight
 		 */
-		finder.highlight = function(query, startTag, endTag) {
+		finder.highlightAll = function(query) {
 		  	var queryArray = [query];
  /*
   if (!document.body || typeof(document.body.innerHTML) == "undefined") {
@@ -174,12 +181,12 @@
 	  		var bodyText = $('#content')[0].innerHTML;
 	
 			for (var i = 0; i < queryArray.length; i++) {
-				bodyText = doHighlight(bodyText, queryArray[i]);
+				bodyText = tagAll(bodyText, queryArray[i]);
 			}
   
 			$('#content')[0].innerHTML = bodyText;
 			return true;
-		}
+		};
 
 /**
  * Search function borrowed from http://www.nsftools.com/misc/SearchAndHighlight.htm 
@@ -191,12 +198,7 @@
  * highlightStartTag or highlightEndTag parameters are omitted or
  * are empty strings then the default <font> tags will be used.
  */
-function doHighlight(bodyText, searchTerm, highlightStartTag, highlightEndTag) {
-  // the highlightStartTag and highlightEndTag parameters are optional
-	if ((!highlightStartTag) || (!highlightEndTag)) {
-    highlightStartTag = '<span class="matches">';
-    highlightEndTag = '</span>';
-  }
+function tagAll(bodyText, searchTerm) {
   
   // find all occurrences of the search term in the given text,
   // and add some "highlight" tags to them (we're not using a
@@ -219,7 +221,7 @@ function doHighlight(bodyText, searchTerm, highlightStartTag, highlightEndTag) {
       if (bodyText.lastIndexOf(">", i) >= bodyText.lastIndexOf("<", i)) {
         // skip anything inside a <script> block
         if (lcBodyText.lastIndexOf("/script>", i) >= lcBodyText.lastIndexOf("<script", i)) {
-          newText += bodyText.substring(0, i) + highlightStartTag + bodyText.substr(i, searchTerm.length) + highlightEndTag;
+          newText += bodyText.substring(0, i) + finder.options.startTag + bodyText.substr(i, searchTerm.length) + finder.options.endTag;
           bodyText = bodyText.substr(i + searchTerm.length);
           lcBodyText = bodyText.toLowerCase();
           i = -1;
@@ -235,7 +237,7 @@ function doHighlight(bodyText, searchTerm, highlightStartTag, highlightEndTag) {
 
 		
 		finder.clearHighlights = function() {
-			getContent()[0].innerHTML.find('.matches').unwrap();
+			$('.' + finder.options.matchClass).removeClass(finder.options.matchClass);
 		};
 		
 		/**
@@ -258,10 +260,61 @@ function doHighlight(bodyText, searchTerm, highlightStartTag, highlightEndTag) {
 				hide();
 			});
 			
+			/** 
+			 * Highlight the next match, if any
+			 */
 			getNext().click(function(e) {
 				e.preventDefault();
-				alert('next');
-				finder.clearHighlights();
+				finder.move('next');
+			});
+			
+			/** 
+			 * Go to next or previous
+			 * @param <string> direction next or previous
+			 */
+			finder.move = function(direction) {
+				var directions = {
+					next: 'next',
+					back: 'back'
+				};
+				var matches = $('.' + finder.options.matchClass);
+				var currentIndex, nextIndex;
+				if (directions[direction].length > 0) {
+					if (direction == directions['next']) {
+						// Test whether a next exists
+						if (matches.length > finder.current) {
+							nextIndex = finder.current + 1;
+						} else {
+							nextIndex = 0;
+						}
+					} else if (direction == directions['back']) {
+						if (finder.current == 0) {
+							nextIndex = matches.length - 1;
+						} else {
+							nextIndex = finder.current - 1;
+						}
+					}
+					
+					// Modify classes on elements
+					$(matches[finder.current]).removeClass(finder.options.onClass);
+					$(matches[nextIndex]).addClass(finder.options.onClass);
+					finder.current = nextIndex;
+				} else {
+					return false; // Not a real argument
+				}
+			};	
+			
+			getNext().click(function(e) {
+				e.preventDefault();
+				var next = $('.' + finder.options.matchClass)[finder.current + 1];
+				if ($(next).length > 0) {
+					var matches = $('.' + finder.options.matchClass);
+					$(matches[finder.current]).removeClass(finder.options.onClass);
+					$(matches[finder.current + 1]).addClass(finder.options.onClass);
+					finder.current++;
+				} else {
+					finder.current = 0;
+				}
 			});
 			
 			$('#searchTextBtn').click(function(e) {
@@ -271,18 +324,17 @@ function doHighlight(bodyText, searchTerm, highlightStartTag, highlightEndTag) {
 				if (query.length > 0) {
 					getSearchField().css('background-color', finder.colors.clear);
 
-					finder.currentPosition = 0;					
-					finder.findMatchPositions(query, body, finder.currentPosition);
+					finder.current = 0;					
+					finder.findMatchPositions(query, body, finder.current);
 
 					// Highlight
 					if (finder.findMatchPositions.length > 0) {
-						//finder.highlight(finder.findMatchPositions[finder.currentPosition], query.length);
+						//finder.highlight(finder.findMatchPositions[finder.current], query.length);
 						//finder.highlight(3, 3);
-						finder.highlight(query);
+						finder.highlightAll(query);
 						
-						// enable first highlight
-						window.console.log($('.matches').get(0));
-						var first = $('.matches').get(finder.currentPosition);
+						// Enable first highlight
+						var first = $('.' + finder.options.matchClass).get(finder.current);
 						$(first).addClass('enabled');
 					}
 				} else {
