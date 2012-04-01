@@ -1,5 +1,7 @@
 /*
- * By Ari Lacenski
+ * Mobile find-on-page
+ * 
+ * by Ari Lacenski
  * 03302012
  */
 ;(function($) {
@@ -289,15 +291,7 @@
 				hide();
 			});
 			finder.togglePrevious(false);
-			
-			/** 
-			 * Highlight the next match, if any
-			 */
-			getNext().click(function(e) {
-				e.preventDefault();
-				finder.move('next');
-			});
-			
+						
 			// Assign different behavior to findNext depending on whether search has begun 
 			$('#findNext').delegate(this, 'click', function(e) {
 				e.preventDefault();
@@ -313,17 +307,18 @@
 					var query = $.trim(getSearchField().val());
 					if (query.length > 0) {
 						getSearchField().css('background-color', finder.colors.clear);
-						//Enable previous button
-						finder.togglePrevious(true);
-				
+						
 						finder.current = 0;
-						if (body.search(new RegExp(query)) !== -1) {
+						// Initial check should be case-insensitive
+						if (body.toLowerCase().search(new RegExp(query.toLowerCase())) !== -1) {
 							finder.highlightAll(query);
 							
 							// Enable first highlight
 							var first = $('.' + finder.options.matchClass).get(finder.current);
 							$(first).addClass('enabled');
 							finder.searchBegan = true;
+							//Enable previous button
+							finder.togglePrevious(true);
 						} else {
 							window.console.log('no match found');
 							getSearchField().css('background-color', finder.colors.error);
