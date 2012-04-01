@@ -189,7 +189,9 @@
   		
 		}
 
-/* Search function borrowed from http://www.nsftools.com/misc/SearchAndHighlight.htm */ 		
+/**
+ * Search function borrowed from http://www.nsftools.com/misc/SearchAndHighlight.htm 
+ */ 		
 /*
  * This is the function that actually highlights a text string by
  * adding HTML tags before and after all occurrences of the search
@@ -249,7 +251,7 @@ function doHighlight(bodyText, searchTerm, highlightStartTag, highlightEndTag)
 		 */
 		finder.init = function() {
 			// Construct finder div
-			var html = '<div class="findtoggle" id="showToggle"><a href="">Show page search</a></div><div id="findOnPage"><label for="searchText">Find</label><input type="text" id="searchText" name="searchText"><button id="searchTextBtn" name="searchTextBtn" value="Go">Go</button></div><div class="findtoggle" id="hideToggle"><a href="">Hide page search</a></div>';
+			var html = '<div class="findtoggle" id="showToggle"><a href="">Show page search</a></div><div id="findOnPage"><label for="searchText">Find</label><input type="text" id="searchText" name="searchText"><button id="searchTextBtn" name="searchTextBtn" value="Go">Go</button><span id="clearsearch">clear</span><span id="findNext"><a href="">next</a></span></div></div>';
 			$('#content_wrapper').prepend($(html));
 			
 			// Click handlers
@@ -265,8 +267,8 @@ function doHighlight(bodyText, searchTerm, highlightStartTag, highlightEndTag)
 			
 			getNext().click(function(e) {
 				e.preventDefault();
+				alert('next');
 				finder.clearHighlights();
-				
 			});
 			
 			$('#searchTextBtn').click(function(e) {
