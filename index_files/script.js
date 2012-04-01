@@ -222,6 +222,29 @@
 		};
 		
 		/**
+		* togglePrevious
+		* Activate the Previous button, or not
+		* @param boolean enable
+		*/
+		finder.togglePrevious = function(enable) {
+			getPrevious().unbind('click');
+			if (enable == true) {
+				getPrevious().removeClass('disabled');
+				getPrevious().attr('href', '#');
+				
+				getPrevious().bind('click', function(e) {
+					e.preventDefault();
+					if (finder.searchBegan == true) {
+						finder.move('back');
+					}
+				});
+			} else {
+				$(this).addClass('disabled');
+				$(this).removeAttr('href');
+			}
+		}
+
+		/**
 		 * init
 		 * Construct the finder div
 		 */
@@ -233,19 +256,23 @@
 			'<label for="searchText">Find</label>' + 
 			'<input type="text" id="searchText" name="searchText">' +
 				'<div id="findNav">' +
-					'<a href="#" class="icons prev disabled" id="findPrevious"></a>' +
+					'<a class="icons prev disabled" id="findPrevious"></a>' +
 					'<a href="#" class="icons next" id="findNext"></a>' +
 				'</div>' +
-			'</div>';
-			
+			'</div>';	
 			
 			$('#content_wrapper').prepend($(html));
 			
-			$(getSearchField()).blur(function(e) {
+			// Reset behavior on new search text
+			getSearchField().delegate(this, 'blur', function(e) {
+			/*
+				
 				if ($(this).val().length > 0) {
+					finder.togglePrevious(false);
 					finder.searchBegan = false;
 					finder.clearTags();
 				}
+				*/
 			});
 			
 			// Click handlers
@@ -261,6 +288,7 @@
 				finder.searchBegan = false;
 				hide();
 			});
+			finder.togglePrevious(false);
 			
 			/** 
 			 * Highlight the next match, if any
@@ -270,16 +298,12 @@
 				finder.move('next');
 			});
 			
-			getPrevious().click(function(e) {
-				e.preventDefault();
-				finder.move('back');
-			});	
-			
 			// Assign different behavior to findNext depending on whether search has begun 
 			$('#findNext').delegate(this, 'click', function(e) {
 				e.preventDefault();
-				window.console.log('clicked next');				
 				if (finder.searchBegan) {
+					//Enable previous button
+					finder.togglePrevious(true);
 					finder.move('next');
 				} else {
 					// Clear any existing matches
@@ -287,10 +311,11 @@
 					// Start over with new content				
 					var body = finder.getText(getContent());
 					var query = $.trim(getSearchField().val());
-					//window.console.log(body);
 					if (query.length > 0) {
 						getSearchField().css('background-color', finder.colors.clear);
-	
+						//Enable previous button
+						finder.togglePrevious(true);
+				
 						finder.current = 0;
 						if (body.search(new RegExp(query)) !== -1) {
 							finder.highlightAll(query);
@@ -299,6 +324,9 @@
 							var first = $('.' + finder.options.matchClass).get(finder.current);
 							$(first).addClass('enabled');
 							finder.searchBegan = true;
+						} else {
+							window.console.log('no match found');
+							getSearchField().css('background-color', finder.colors.error);
 						}
 					} else {
 						//getSearchField().css('background-color', finder.colors.error);					
