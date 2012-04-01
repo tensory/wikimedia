@@ -96,11 +96,7 @@
 		
 		function getSearchField() {
 			return $('#searchText');
-		};
-		
-		function getSearchButton() {
-			return $('#searchTextBtn');
-		};
+		};		
 		
 		function getContent() {
 			return $('#content');
@@ -110,8 +106,8 @@
 			return $('#findNext');
 		}
 		
-		function getPrev() {
-			return $('#findPrev');
+		function getPrevious() {
+			return $('#findPrevious');
 		}
 		
 		
@@ -121,6 +117,8 @@
 		finder.getText = function(element) {
 			return $(element).text();
 		}
+		
+		finder.searchBegan = false;
 		
 		// Keep track of state
 		finder.matchPositions = [];
@@ -163,6 +161,42 @@
 			}
 		};
 		
+		/** 
+		* Go to next or previous
+		* @param <string> direction next or previous
+		*/
+		finder.move = function(direction) {
+		   var directions = {
+			   next: 'next',
+			   back: 'back'
+		   };
+		   var matches = $('.' + finder.options.matchClass);
+		   var currentIndex, nextIndex;
+		   if (directions[direction].length > 0) {
+			   if (direction == directions['next']) {
+				   // Test whether a next exists
+				   if (matches.length > finder.current) {
+					   nextIndex = finder.current + 1;
+				   } else {
+					   nextIndex = 0;
+				   }
+			   } else if (direction == directions['back']) {
+				   if (finder.current == 0) {
+					   nextIndex = matches.length - 1;
+				   } else {
+					   nextIndex = finder.current - 1;
+				   }
+			   }
+			   
+			   // Modify classes on elements
+			   $(matches[finder.current]).removeClass(finder.options.onClass);
+			   $(matches[nextIndex]).addClass(finder.options.onClass);
+			   finder.current = nextIndex;
+		   } else {
+			   return false; // Not a real argument
+		   }
+		};
+		
 		/**
 		 * Apply highlights
 		 * @param int position Location to highlight
@@ -188,56 +222,47 @@
 			return true;
 		};
 
-/**
- * Search function borrowed from http://www.nsftools.com/misc/SearchAndHighlight.htm 
- */ 		
-/*
- * This is the function that actually highlights a text string by
- * adding HTML tags before and after all occurrences of the search
- * term. You can pass your own tags if you'd like, or if the
- * highlightStartTag or highlightEndTag parameters are omitted or
- * are empty strings then the default <font> tags will be used.
- */
-function tagAll(bodyText, searchTerm) {
-  
-  // find all occurrences of the search term in the given text,
-  // and add some "highlight" tags to them (we're not using a
-  // regular expression search, because we want to filter out
-  // matches that occur within HTML tags and script blocks, so
-  // we have to do a little extra validation)
-  var newText = "";
-  var i = -1;
-  var lcSearchTerm = searchTerm.toLowerCase();
-  var lcBodyText = bodyText.toLowerCase();
-
-
-  while (bodyText.length > 0) {
-  	i = lcBodyText.indexOf(lcSearchTerm, i+1);
-    if (i < 0) {
-      newText += bodyText;
-      bodyText = "";
-    } else {
-      // skip anything inside an HTML tag
-      if (bodyText.lastIndexOf(">", i) >= bodyText.lastIndexOf("<", i)) {
-        // skip anything inside a <script> block
-        if (lcBodyText.lastIndexOf("/script>", i) >= lcBodyText.lastIndexOf("<script", i)) {
-          newText += bodyText.substring(0, i) + finder.options.startTag + bodyText.substr(i, searchTerm.length) + finder.options.endTag;
-          bodyText = bodyText.substr(i + searchTerm.length);
-          lcBodyText = bodyText.toLowerCase();
-          i = -1;
-        }
-      }
-    }
-  }
-  
-  
-  return newText;
-}
-
-
+		/**
+		 * Search function borrowed from http://www.nsftools.com/misc/SearchAndHighlight.htm 
+		 */ 		
+		function tagAll(bodyText, searchTerm) {  
+			// Find all occurrences of the search term in the given text,
+			// and add some "highlight" tags to them (we're not using a
+			// regular expression search, because we want to filter out
+			// matches that occur within HTML tags and script blocks, so
+			// we have to do a little extra validation)
+			var newText = "";
+			var i = -1;
+			var lcSearchTerm = searchTerm.toLowerCase();
+			var lcBodyText = bodyText.toLowerCase();
 		
-		finder.clearHighlights = function() {
-			$('.' + finder.options.matchClass).removeClass(finder.options.matchClass);
+			while (bodyText.length > 0) {
+				i = lcBodyText.indexOf(lcSearchTerm, i+1);
+				if (i < 0) {
+					newText += bodyText;
+					bodyText = "";
+				} else {
+					// skip anything inside an HTML tag
+					if (bodyText.lastIndexOf(">", i) >= bodyText.lastIndexOf("<", i)) {
+					// skip anything inside a <script> block
+						if (lcBodyText.lastIndexOf("/script>", i) >= lcBodyText.lastIndexOf("<script", i)) {
+							newText += bodyText.substring(0, i) + finder.options.startTag + bodyText.substr(i, searchTerm.length) + finder.options.endTag;
+							bodyText = bodyText.substr(i + searchTerm.length);
+							lcBodyText = bodyText.toLowerCase();
+							i = -1;
+						}
+					}
+				}
+			}
+			return newText;
+		}
+
+		/**
+		 * clearTags
+		 * Remove all prior search tags
+		 */
+		finder.clearTags = function() {
+			$('.' + finder.options.matchClass).contents().unwrap();
 		};
 		
 		/**
@@ -246,8 +271,29 @@ function tagAll(bodyText, searchTerm) {
 		 */
 		finder.init = function() {
 			// Construct finder div
-			var html = '<div class="findtoggle" id="showToggle"><a href="">Show page search</a></div><div id="findOnPage"><label for="searchText">Find</label><input type="text" id="searchText" name="searchText"><button id="searchTextBtn" name="searchTextBtn" value="Go">Go</button><span id="clearsearch">clear</span><span id="findNext"><a href="">next</a></span></div></div>';
+			var html = '<div class="findtoggle" id="showToggle"><a href="">Show page search</a></div>' + 
+			'<div id="findOnPage">' +
+			'<a class="icons delete" id="hideToggle"></a>' +
+			'<label for="searchText">Find</label>' + 
+			'<input type="text" id="searchText" name="searchText">' +
+			'<div id="findNav">' +
+				'<a href="#" class="icons prev disabled" id="findPrevious"></a>' +
+				'<a href="#" class="icons next" id="findNext"></a>' +
+			'</div>' +
+			/*
+			'<span id="clearsearch">clear</span><span id="findNext"><a href="">next</a></span></div></div>';
+			*/
+			'</div>';
+			
+			
 			$('#content_wrapper').prepend($(html));
+			
+			$(getSearchField()).blur(function(e) {
+				if ($(this).val().length > 0) {
+					finder.searchBegan = false;
+					finder.clearTags();
+				}
+			});
 			
 			// Click handlers
 			$('#showToggle').click(function(e) {
@@ -268,77 +314,42 @@ function tagAll(bodyText, searchTerm) {
 				finder.move('next');
 			});
 			
-			/** 
-			 * Go to next or previous
-			 * @param <string> direction next or previous
-			 */
-			finder.move = function(direction) {
-				var directions = {
-					next: 'next',
-					back: 'back'
-				};
-				var matches = $('.' + finder.options.matchClass);
-				var currentIndex, nextIndex;
-				if (directions[direction].length > 0) {
-					if (direction == directions['next']) {
-						// Test whether a next exists
-						if (matches.length > finder.current) {
-							nextIndex = finder.current + 1;
-						} else {
-							nextIndex = 0;
-						}
-					} else if (direction == directions['back']) {
-						if (finder.current == 0) {
-							nextIndex = matches.length - 1;
-						} else {
-							nextIndex = finder.current - 1;
-						}
-					}
-					
-					// Modify classes on elements
-					$(matches[finder.current]).removeClass(finder.options.onClass);
-					$(matches[nextIndex]).addClass(finder.options.onClass);
-					finder.current = nextIndex;
-				} else {
-					return false; // Not a real argument
-				}
-			};	
+			getPrevious().click(function(e) {
+				e.preventDefault();
+				finder.move('back');
+			});	
 			
+			// Assign different behavior to findNext depending on whether search has begun 
 			getNext().click(function(e) {
 				e.preventDefault();
-				var next = $('.' + finder.options.matchClass)[finder.current + 1];
-				if ($(next).length > 0) {
-					var matches = $('.' + finder.options.matchClass);
-					$(matches[finder.current]).removeClass(finder.options.onClass);
-					$(matches[finder.current + 1]).addClass(finder.options.onClass);
-					finder.current++;
+				
+				if (finder.searchBegan) {
+					finder.move('next');
 				} else {
-					finder.current = 0;
-				}
-			});
-			
-			$('#searchTextBtn').click(function(e) {
-				var body = finder.getText(getContent());
-				var query = $.trim(getSearchField().val());
-				//window.console.log(body);
-				if (query.length > 0) {
-					getSearchField().css('background-color', finder.colors.clear);
-
-					finder.current = 0;					
-					finder.findMatchPositions(query, body, finder.current);
-
-					// Highlight
-					if (finder.findMatchPositions.length > 0) {
-						//finder.highlight(finder.findMatchPositions[finder.current], query.length);
-						//finder.highlight(3, 3);
-						finder.highlightAll(query);
-						
-						// Enable first highlight
-						var first = $('.' + finder.options.matchClass).get(finder.current);
-						$(first).addClass('enabled');
+					// Clear any existing matches
+					finder.clearTags();
+					// Start over with new content				
+					var body = finder.getText(getContent());
+					var query = $.trim(getSearchField().val());
+					//window.console.log(body);
+					if (query.length > 0) {
+						getSearchField().css('background-color', finder.colors.clear);
+	
+						finder.current = 0;					
+						finder.findMatchPositions(query, body, finder.current);
+	
+						// Highlight
+						if (finder.findMatchPositions.length > 0) {
+							finder.highlightAll(query);
+							
+							// Enable first highlight
+							var first = $('.' + finder.options.matchClass).get(finder.current);
+							$(first).addClass('enabled');
+							finder.searchBegan = true;
+						}
+					} else {
+						getSearchField().css('background-color', finder.colors.error);					
 					}
-				} else {
-					getSearchField().css('background-color', finder.colors.error);					
 				}
 			});
 			

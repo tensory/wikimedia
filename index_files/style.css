@@ -1,3 +1,12 @@
+/* Content resets*/
+body {
+	margin: 0;
+}
+
+#content {
+	margin: 22px;
+}
+
 /* Text resets */
 h1, h2, h3, h4, h5, h6 {
 	font-family: 'Crete Round', serif;
@@ -34,9 +43,6 @@ h3 {
 	display: block;
 }
 
-#hideToggle {
-	margin-top: 10px;
-}
 .findtoggle a:hover { /* desktops only */
 	text-decoration: underline;
 }
@@ -45,13 +51,11 @@ h3 {
 	display: none;
 	position: relative;
 	border-bottom: 1px #777;
-	width: 120%;
 	height: 60px;
 	padding: 5px 20px;
 	background: #DDDDDD;
 	background: -webkit-gradient(linear, left top, left bottom, from(#EEEEEE), to(#BBBBBB));
 	background: -moz-linear-gradient(top,  #EEE,  #BBB);
-	margin: -22px -22px 0;
 }
 
 #findOnPage input {
@@ -68,6 +72,7 @@ h3 {
 #findOnPage label {
 	color: #777;
 	font-size: 24px;
+	line-height: 60px;
 	font-family: 'Crete Round', serif;
 	font-weight: normal;
 	padding-right: 10px;
@@ -81,4 +86,37 @@ span.matches {
 span.matches.enabled {
 	background-color: #FF0000;
 	color: blue;
+}
+
+/* 
+ * iPhone icons from http://www.iconfinder.com/search/?q=iconset%3Aiphone_toolbar_icons 
+ * License: Creative Commons Attribution
+ */
+#findOnPage .icons {
+	width: 26px;
+	height: 26px;
+	margin: 18px 5px 0;
+	display: inline-block;
+	
+}
+
+#findNav {
+	display: inline;
+}
+
+#findOnPage .icons.delete {
+	float: right;
+	background-image: url('bin/iphone_delete.png');
+}
+
+#findNext {
+	background-image: url('bin/iphone_arrow_right.png');
+}
+
+#findPrevious {
+	background-image: url('bin/iphone_arrow_left.png');
+}
+
+#findNav .disabled {
+	opacity: 0.25;
 }
