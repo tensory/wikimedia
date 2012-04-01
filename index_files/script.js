@@ -117,47 +117,6 @@
 		
 		finder.searchBegan = false;
 		
-		// Keep track of state
-		finder.matchPositions = [];
-		
-		finder.textToSearch = '';
-
-		/**
-		 * Perform matching search
-		 * @param <string> needle Text to find
-		 * @param <string> haystack Text corpus to search
-		 */		
-		finder.findMatchPositions = function(needle, haystack, matchPosition) {
-			var pattern = new RegExp(needle);
-			var pos = haystack.search(pattern);
-			var hay = haystack;
-			var runningTotal = matchPosition;			
-			if (hay.length > 0) {
-				if (pos !== -1) {
-					// Remove searched text from field
-					hay = hay.substr(pos + needle.length, hay.length);
-					// Add position if it doesn't already exist
-					var positionKnown = false;
-					$.each(finder.matchPositions, function(index, e) {
-						if (pos == finder.matchPositions[index]) {
-							positionKnown = true;
-						}
-					});
-					if (!positionKnown) {
-						finder.matchPositions.push(pos + runningTotal);
-					}
-					finder.findMatchPositions(needle, hay, pos + runningTotal);
-				} else {
-					// Done
-					window.console.log(finder.matchPositions);
-					return;
-				}
-			} else {
-				// Break out of loop
-				return;
-			}
-		};
-		
 		/** 
 		* Go to next or previous
 		* @param <string> direction next or previous
