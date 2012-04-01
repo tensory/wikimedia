@@ -66,8 +66,8 @@
 		var finder = {};
 		
 		finder.colors = {
-			highlight: '#00FF00',
-			error: '#FF0000',
+			highlight: '#B3D6FF',
+			error: '#FDFFC9',
 			clear: '#FFFFFF'
 		};
 		
@@ -155,6 +155,7 @@
 		}
 		
 		finder.searchBegan = false;
+		finder.lastString = '';
 		
 		/** 
 		* Go to next or previous
@@ -236,8 +237,8 @@
 					}
 				});
 			} else {
-				$(this).addClass('disabled');
-				$(this).removeAttr('href');
+				getPrevious().addClass('disabled');
+				getPrevious().removeAttr('href');
 			}
 		}
 
@@ -262,14 +263,11 @@
 			
 			// Reset behavior on new search text
 			getSearchField().delegate(this, 'blur', function(e) {
-			/*
-				
 				if ($(this).val().length > 0) {
-					finder.togglePrevious(false);
+					//finder.togglePrevious(false);
 					finder.searchBegan = false;
 					finder.clearTags();
 				}
-				*/
 			});
 			
 			// Click handlers
@@ -292,7 +290,7 @@
 				e.preventDefault();
 				if (finder.searchBegan) {
 					//Enable previous button
-					finder.togglePrevious(true);
+					//finder.togglePrevious(true);
 					finder.move('next');
 				} else {
 					// Clear any existing matches
@@ -315,11 +313,12 @@
 							//Enable previous button
 							finder.togglePrevious(true);
 						} else {
-							window.console.log('no match found');
+							finder.searchBegan = false;
+							finder.togglePrevious(false);
 							getSearchField().css('background-color', finder.colors.error);
 						}
 					} else {
-						//getSearchField().css('background-color', finder.colors.error);					
+						finder.searchBegan = false;					
 					}
 				}
 			});
