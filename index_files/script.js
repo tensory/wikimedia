@@ -374,16 +374,15 @@
 	 			e.preventDefault();
 	 		});
 */	 		
-	 		$('#flatBox').show();
+	 		getFlatBox().show();
 	 	};
 	 	
-	 	flatbox.clear = function() {
-	 	window.console.log('clearing');
-	 		$(window).unbind('touchmove');
+	 	flatbox.clear = function() {	
+/*
 			$(window).bind('touchmove', function() {
 				return true;
 			});
-	 		
+*/	 		
 	 		getFlatBox().hide();
 			getFlatBoxCaption().html('');	 		
 	 	};
@@ -426,6 +425,19 @@
 	 			flatbox.clear();
 	 		})
 	 	};
+	 	
+	 	flatbox.updateSizeOnOrientationChange = function() {
+	 		window.addEventListener("orientationchange", updateSize, false);
+	 		
+	 		function updateSize() {
+	 			if ($('#fbCurrent').length > 0) {
+					$('#fbCurrent').css({
+						'height': ($(window).height() * 0.7) +'px',
+						'width': ''
+					}); 	 			
+	 			}
+	 		}
+	 	}
 	 	
 	 	return flatbox;
 	 })();
