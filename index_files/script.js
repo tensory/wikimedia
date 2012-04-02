@@ -1,8 +1,10 @@
 /*
- * Mobile find-on-page
+ * Wikimedia Foundation coding exercise.
  * 
- * by Ari Lacenski
- * 03302012
+ * Includes find-on-page and image lightbox modules. 
+ * 
+ * by Ari Lacenski, except where attributed in Finder module.
+ * 04012012
  */
 ;(function($) {
 	$(document).ready(function() {
@@ -363,27 +365,47 @@
 	 	var getFlatBoxCaption = function() {
 	 		return $('#fbCaption');
 	 	};
+	 	
+	 	var inhibitScroll = function(event) {
+	 		event.preventDefault();
+	 	} 
+	 	
+	 	var updateSize = function() {
+			var orientation = {};
+			
+			if ($('#fbCurrent').length > 0) {
+				if ($(window).height() > $(window).width()) {
+					orientation = {
+						'width' : '100%',
+						'height' : ''
+					};
+				} else {
+					orientation = {
+						'height' : '100%',
+						'width' : ''
+					};
+				}	
+				$('#fbCurrent').css(orientation);
+			}
+		};
 	 	/**
 	 	 * Show the image and disable scrolling past it.
 	 	 * @param <object> image
 	 	 */
 	 	flatbox.show = function(image) {
 	 		// Disable moving
-/*
-	 		$(window).bind('touchmove', function(e) {
-	 			e.preventDefault();
-	 		});
-*/	 		
+	 		$(window).bind('touchmove', inhibitScroll);
+
 	 		getFlatBox().show();
 	 	};
 	 	
-	 	flatbox.clear = function() {	
-/*
+	 	flatbox.clear = function() {
+	 		$(window).unbind('touchmove', inhibitScroll);
 			$(window).bind('touchmove', function() {
 				return true;
 			});
-*/	 		
 	 		getFlatBox().hide();
+	 		getFlatBoxImage().html($('<div id="fbCaption"></div>'));
 			getFlatBoxCaption().html('');	 		
 	 	};
 	 	
@@ -394,14 +416,13 @@
 	 	flatbox.init = function() {
 	 		var html = '<div id="flatBox">' +
 	 			'<div id="fbScreen"></div>' +
-	 			'<div id="fbImg"></div>' +
-				'<div id="fbCaption"></div>' +
+	 			'<div id="fbImg"><div id="fbCaption"></div></div>' +
 	 			'</div>';
 	 		$('body').prepend($(html));
 	 		
 	 		$('#content img').click(function() {
 	 			// On click, deep clone the image copy to the viewer
-	 			var img = $(this).clone();
+	 			var img = $('<img src="' + $(this).attr('src') + '"/>');
 	 			$(img).attr('id', 'fbCurrent');
 	 			$(img).css({
 	 			  'background-color' : '#FFFFFF',
@@ -410,13 +431,14 @@
 				  'width' : ''
 				});
 		 			
-	 			getFlatBoxImage().html(img);
+	 			getFlatBoxImage().prepend($(img));
 				
 				// Place caption
 				var wrapper = $('<span id="fbCaptionWrap"></span>');
 				$(wrapper).text($(this).attr('title'));
 				getFlatBoxCaption().html(wrapper);
 	 			
+	 			updateSize();
 	 			flatbox.show($(this));
 	 		});
 	 		
@@ -424,19 +446,13 @@
 	 		$('#fbImg, #fbCaption, #fbScreen').click(function(e) {
 	 			flatbox.clear();
 	 		})
+	 		
+	 		flatbox.updateSizeOnOrientationChange();
 	 	};
 	 	
 	 	flatbox.updateSizeOnOrientationChange = function() {
 	 		window.addEventListener("orientationchange", updateSize, false);
-	 		
-	 		function updateSize() {
-	 			if ($('#fbCurrent').length > 0) {
-					$('#fbCurrent').css({
-						'height': ($(window).height() * 0.7) +'px',
-						'width': ''
-					}); 	 			
-	 			}
-	 		}
+	 		window.addEventListener("resize", updateSize, false);
 	 	}
 	 	
 	 	return flatbox;
