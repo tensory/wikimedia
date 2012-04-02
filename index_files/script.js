@@ -309,8 +309,6 @@
 			$('#findNext').delegate(this, 'click', function(e) {
 				e.preventDefault();
 				if (finder.searchBegan) {
-					//Enable previous button
-					//finder.togglePrevious(true);
 					finder.move('next');
 				} else {
 					// Clear any existing matches
