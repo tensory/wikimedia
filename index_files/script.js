@@ -6,7 +6,7 @@
  * by Ari Lacenski, except where attributed in Finder module.
  * 04012012
  */
-;(function($) {
+(function($) {
 	$(document).ready(function() {
 		// Reset sizing on all document images
 		Optimize.resetImageSizing($('img'));
