@@ -1,6 +1,9 @@
+/index_files:
 Mobile optimization for Wikimedia sample content.
-
 Includes homemade Find-On-Page and image lightbox modules as enhancements. See index_files/script.js.
+
+/currency:
+Implementation of CurrencyConverter class and exchange_rates table definition.
 
 By Ari Lacenski / @tensory
 03302012
