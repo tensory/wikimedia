@@ -5,8 +5,8 @@
  * CurrencyConverter
  * @author Ari Lacenski
  */
-
 class CurrencyConverter {
+    // Database connection for CurrencyConverter
     private static $er;	
 
     public function __construct() {
@@ -72,7 +72,7 @@ class CurrencyConverter {
  * @author Ari Lacenski
  */
 class ExchangeRates {
-    protected $currency;
+	protected $currency;
     protected $base;
     protected $rate;
     protected $db;
@@ -83,7 +83,7 @@ class ExchangeRates {
         // Initialize DB connection here
         $params = array(
             'username' => 'ari',
-            'password' => '4ndThis0',
+            'password' => '[deleted]',
             'host' => 'localhost',
             'database' => 'wmf'
         );
@@ -113,21 +113,22 @@ class ExchangeRates {
             
     /**
      * Populate table from data from an XML feed
+     * @param string source URL of XML source
      */
     public function populateDbFromFeed($source) {
-        // Get feed data
+        // Get feed data from URL
         $xml = file_get_contents($source);
        
         // Use SimpleXML to push feed data into table
-	if ($xml) {
-		try {
-			$this->populate(new SimpleXMLElement($xml));
-		} catch(Exception $e) {
-			die('Can\'t insert into DB: ' . $e);
-		} 
-	} else {
-		throw new Exception('No XML string to work with!');
-	}
+		if (!$xml) {
+			throw new Exception('No XML string to work with!');
+		} else {
+			try {
+				$this->populate(new SimpleXMLElement($xml));
+			} catch(Exception $e) {
+				die('Can\'t insert into DB: ' . $e);
+			} 
+		}
     }
     
     /**
@@ -137,6 +138,8 @@ class ExchangeRates {
      *  <currency>BGN</currency>
      *  <rate>0.6707</rate>
      * </conversion>
+     * 
+     * @param object object Conversion object 
      */
     private function populate($object) {
         if (mysqli_connect_errno()) {
@@ -184,7 +187,9 @@ class ExchangeRates {
 	return $rate;
     }
 }
+// End class
 
+// Testing from this point onward
 $cc = new CurrencyConverter();
 
 // Convert a few amounts into USD
@@ -208,5 +213,3 @@ foreach ($result as $r) {
     echo $tests[$i] . ": " . $result[$i] . "\n";
     $i++;
 }
-
-?>
