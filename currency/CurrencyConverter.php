@@ -173,18 +173,18 @@ class ExchangeRates {
      * @param string $right 
      */
     public function getRate($left, $right) {
-       if ($left == $right) {
-	          throw InvalidArgumentException('Cannot convert a currency to itself');
-       }
-       $rate = 0.0;
-
-	$stmt = $this->db->stmt_init();
-	$stmt->prepare('SELECT rate FROM exchange_rates WHERE currency = ? AND base="USD" LIMIT 1');
-	$stmt->bind_param('s', $left);
-	$stmt->execute();
-	$stmt->bind_result($rate);
-	$stmt->fetch();
-	return $rate;
+		if ($left == $right) {
+			  throw InvalidArgumentException('Cannot convert a currency to itself');
+		}
+		$rate = 0.0;
+		
+		$stmt = $this->db->stmt_init();
+		$stmt->prepare('SELECT rate FROM exchange_rates WHERE currency = ? AND base="USD" LIMIT 1');
+		$stmt->bind_param('s', $left);
+		$stmt->execute();
+		$stmt->bind_result($rate);
+		$stmt->fetch();
+		return $rate;
     }
 }
 // End class
@@ -195,8 +195,7 @@ $cc = new CurrencyConverter();
 // Convert a few amounts into USD
 $tests = array(
     'JPY 5000',
-    'CZK 62.5',
-    'FOO 6323.5'
+    'CZK 62.5'
 );
 
 // Test single conversion
